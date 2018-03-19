@@ -1,7 +1,7 @@
 {
   "name": "@scorum/bip39",
   "version": "2.5.0",
-  "description": "Scorum BIP39: Mnemonic code for generating deterministic keys",
+  "description": "Scorum BIP39: Mnemonic code for generating deterministic keys. Fork of https://github.com/bitcoinjs/bip39",
   "main": "index.js",
   "scripts": {
     "coverage": "nyc --branches 100 --functions 100 --check-coverage npm run unit",
