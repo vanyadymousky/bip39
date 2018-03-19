@@ -1,19 +1,16 @@
-var Buffer = require('safe-buffer').Buffer
-var createHash = require('create-hash')
-var pbkdf2 = require('pbkdf2').pbkdf2Sync
-var randomBytes = require('randombytes')
+import { Buffer } from 'safe-buffer'
+import createHash from 'create-hash'
+import { pbkdf2Sync as pbkdf2 } from 'pbkdf2'
+import randomBytes from 'randombytes'
 
-// use unorm until String.prototype.normalize gets better browser support
-var unorm = require('unorm')
-
-var CHINESE_SIMPLIFIED_WORDLIST = require('./wordlists/chinese_simplified.json')
-var CHINESE_TRADITIONAL_WORDLIST = require('./wordlists/chinese_traditional.json')
-var ENGLISH_WORDLIST = require('./wordlists/english.json')
-var FRENCH_WORDLIST = require('./wordlists/french.json')
-var ITALIAN_WORDLIST = require('./wordlists/italian.json')
-var JAPANESE_WORDLIST = require('./wordlists/japanese.json')
-var KOREAN_WORDLIST = require('./wordlists/korean.json')
-var SPANISH_WORDLIST = require('./wordlists/spanish.json')
+import CHINESE_SIMPLIFIED_WORDLIST from './wordlists/chinese_simplified.json'
+import CHINESE_TRADITIONAL_WORDLIST from './wordlists/chinese_traditional.json'
+import ENGLISH_WORDLIST from './wordlists/english.json'
+import KOREAN_WORDLIST from './wordlists/korean.json'
+// var FRENCH_WORDLIST = require('./wordlists/french.json')
+// var ITALIAN_WORDLIST = require('./wordlists/italian.json')
+// var JAPANESE_WORDLIST = require('./wordlists/japanese.json')
+// var SPANISH_WORDLIST = require('./wordlists/spanish.json')
 var DEFAULT_WORDLIST = ENGLISH_WORDLIST
 
 var INVALID_MNEMONIC = 'Invalid mnemonic'
@@ -47,21 +44,21 @@ function salt (password) {
   return 'mnemonic' + (password || '')
 }
 
-function mnemonicToSeed (mnemonic, password) {
-  var mnemonicBuffer = Buffer.from(unorm.nfkd(mnemonic), 'utf8')
-  var saltBuffer = Buffer.from(salt(unorm.nfkd(password)), 'utf8')
+export const mnemonicToSeed = (mnemonic, password) => {
+  var mnemonicBuffer = Buffer.from(mnemonic.normalize('NFKD'), 'utf8')
+  var saltBuffer = Buffer.from(salt(password.normalize('NFKD'), 'utf8'))
 
   return pbkdf2(mnemonicBuffer, saltBuffer, 2048, 64, 'sha512')
 }
 
-function mnemonicToSeedHex (mnemonic, password) {
+export const mnemonicToSeedHex = (mnemonic, password) => {
   return mnemonicToSeed(mnemonic, password).toString('hex')
 }
 
-function mnemonicToEntropy (mnemonic, wordlist) {
+export const mnemonicToEntropy = (mnemonic, wordlist) => {
   wordlist = wordlist || DEFAULT_WORDLIST
 
-  var words = unorm.nfkd(mnemonic).split(' ')
+  var words = mnemonic.normalize('NFKD').split(' ')
   if (words.length % 3 !== 0) throw new Error(INVALID_MNEMONIC)
 
   // convert word indices to 11 bit binary strings
@@ -90,7 +87,7 @@ function mnemonicToEntropy (mnemonic, wordlist) {
   return entropy.toString('hex')
 }
 
-function entropyToMnemonic (entropy, wordlist) {
+export const entropyToMnemonic = (entropy, wordlist) => {
   if (!Buffer.isBuffer(entropy)) entropy = Buffer.from(entropy, 'hex')
   wordlist = wordlist || DEFAULT_WORDLIST
 
@@ -109,10 +106,11 @@ function entropyToMnemonic (entropy, wordlist) {
     return wordlist[index]
   })
 
-  return wordlist === JAPANESE_WORDLIST ? words.join('\u3000') : words.join(' ')
+  // return wordlist === JAPANESE_WORDLIST ? words.join('\u3000') : words.join(' ')
+  return words.join(' ')
 }
 
-function generateMnemonic (strength, rng, wordlist) {
+export const generateMnemonic = (strength, rng, wordlist) => {
   strength = strength || 128
   if (strength % 32 !== 0) throw new TypeError(INVALID_ENTROPY)
   rng = rng || randomBytes
@@ -120,7 +118,7 @@ function generateMnemonic (strength, rng, wordlist) {
   return entropyToMnemonic(rng(strength / 8), wordlist)
 }
 
-function validateMnemonic (mnemonic, wordlist) {
+export const validateMnemonic = (mnemonic, wordlist) => {
   try {
     mnemonicToEntropy(mnemonic, wordlist)
   } catch (e) {
@@ -130,24 +128,16 @@ function validateMnemonic (mnemonic, wordlist) {
   return true
 }
 
-module.exports = {
-  mnemonicToSeed: mnemonicToSeed,
-  mnemonicToSeedHex: mnemonicToSeedHex,
-  mnemonicToEntropy: mnemonicToEntropy,
-  entropyToMnemonic: entropyToMnemonic,
-  generateMnemonic: generateMnemonic,
-  validateMnemonic: validateMnemonic,
-  wordlists: {
-    EN: ENGLISH_WORDLIST,
-    JA: JAPANESE_WORDLIST,
+export const wordlists = {
+  EN: ENGLISH_WORDLIST,
+  // JA: JAPANESE_WORDLIST,
 
-    chinese_simplified: CHINESE_SIMPLIFIED_WORDLIST,
-    chinese_traditional: CHINESE_TRADITIONAL_WORDLIST,
-    english: ENGLISH_WORDLIST,
-    french: FRENCH_WORDLIST,
-    italian: ITALIAN_WORDLIST,
-    japanese: JAPANESE_WORDLIST,
-    korean: KOREAN_WORDLIST,
-    spanish: SPANISH_WORDLIST
-  }
+  chinese_simplified: CHINESE_SIMPLIFIED_WORDLIST,
+  chinese_traditional: CHINESE_TRADITIONAL_WORDLIST,
+  english: ENGLISH_WORDLIST,
+  korean: KOREAN_WORDLIST
+  // french: FRENCH_WORDLIST,
+  // italian: ITALIAN_WORDLIST,
+  // japanese: JAPANESE_WORDLIST,
+  // spanish: SPANISH_WORDLIST
 }
