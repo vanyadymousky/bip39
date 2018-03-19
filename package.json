@@ -1,7 +1,7 @@
 {
-  "name": "bip39",
+  "name": "@scorum/bip39",
   "version": "2.5.0",
-  "description": "Bitcoin BIP39: Mnemonic code for generating deterministic keys",
+  "description": "Scorum BIP39: Mnemonic code for generating deterministic keys",
   "main": "index.js",
   "scripts": {
     "coverage": "nyc --branches 100 --functions 100 --check-coverage npm run unit",
@@ -13,14 +13,13 @@
   "author": "Wei Lu",
   "contributors": [
     {
-      "name": "Daniel Cousens",
-      "email": "email@dcousens.com",
-      "url": "http://dcousens.com"
+      "name": "Ivan Dymousky",
+      "email": "dymouskyia@gmail.com"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/weilu/bip39.git"
+    "url": "https://github.com/vanyadymousky/bip39"
   },
   "license": "ISC",
   "dependencies": {
